@@ -1,0 +1,143 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["views"]
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Product_main_types {
+  id                       Int                        @id @default(autoincrement()) @db.SmallInt
+  name                     String?                    @db.TinyText
+  master_categoriesID      Int?
+  create_date              DateTime?                  @db.Timestamp(0)
+  Product_master_types     Product_master_types?      @relation(fields: [master_categoriesID], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "Product_main_types_Product_master_types_id_fk")
+  Product_types_categories Product_types_categories[]
+
+  @@index([master_categoriesID], map: "Product_main_types_Product_master_types_id_fk")
+}
+
+model Product_master_types {
+  id                 Int                  @id @default(autoincrement())
+  name               String?              @db.TinyText
+  create_date        DateTime?            @db.Timestamp(0)
+  Product_main_types Product_main_types[]
+}
+
+model Product_types_categories {
+  id                   Int                  @id @default(autoincrement())
+  product_main_typesID Int?                 @db.SmallInt
+  product_categoriesID Int?                 @db.SmallInt
+  create_date          DateTime?            @db.Timestamp(0)
+  Product_main_types   Product_main_types?  @relation(fields: [product_main_typesID], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "Product_types_categories_Product_main_types_id_fk")
+  product_categories   product_categories?  @relation(fields: [product_categoriesID], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "Product_types_categories_product_categories_id_fk")
+  combine_categories   combine_categories[]
+
+  @@index([product_main_typesID], map: "Product_types_categories_Product_main_types_id_fk")
+  @@index([product_categoriesID], map: "Product_types_categories_product_categories_id_fk")
+}
+
+model attribute_define {
+  id                  Int                @id @default(autoincrement())
+  attribute_storageID Int?
+  attribute_value     String?            @db.Text
+  attribute_name      String?            @db.Text
+  create_date         DateTime?          @db.Timestamp(0)
+  attribute_storage   attribute_storage? @relation(fields: [attribute_storageID], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "attribute_define_attribute_storage_id_fk")
+  product_child       product_child[]
+  product_detail      product_detail[]
+
+  @@index([attribute_storageID], map: "attribute_define_attribute_storage_id_fk")
+}
+
+model attribute_storage {
+  id               Int                @id @default(autoincrement())
+  name_attribute   String?            @db.VarChar(255)
+  create_date      DateTime?          @db.Timestamp(0)
+  attribute_define attribute_define[]
+}
+
+model combine_categories {
+  id                        Int                       @id @default(autoincrement())
+  name                      String?                   @db.TinyText
+  create_date               DateTime?                 @db.Timestamp(0)
+  product_type_categoriesID Int?
+  Product_types_categories  Product_types_categories? @relation(fields: [product_type_categoriesID], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "combine_categories_Product_types_categories_id_fk")
+  product_parent            product_parent[]
+
+  @@index([product_type_categoriesID], map: "combine_categories_Product_types_categories_id_fk")
+}
+
+model product_categories {
+  id                       Int                        @id @default(autoincrement()) @db.SmallInt
+  name                     String?                    @db.Char(255)
+  create_date              DateTime?                  @db.Timestamp(0)
+  Product_types_categories Product_types_categories[]
+}
+
+model product_child {
+  id               Int               @id @default(autoincrement())
+  product_parentID Int?
+  main_attribute   Int?
+  create_date      DateTime?         @db.Timestamp(0)
+  color_link       String?           @db.VarChar(1000)
+  attribute_define attribute_define? @relation(fields: [main_attribute], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "product_child_attribute_define_id_fk")
+  product_parent   product_parent?   @relation(fields: [product_parentID], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "product_child_product_parent_id_fk")
+  product_detail   product_detail[]
+
+  @@index([main_attribute], map: "product_child_attribute_define_id_fk")
+  @@index([product_parentID], map: "product_child_product_parent_id_fk")
+}
+
+model product_detail {
+  id                 Int               @id @default(autoincrement())
+  product_childID    Int?
+  barcode            String?           @db.VarChar(1000)
+  import_price       Decimal?          @db.Decimal(10, 2)
+  price              Decimal?          @db.Decimal(10, 2)
+  amount             Int?
+  sub_attributeID    Int?
+  storage_locationID Int?
+  attribute_define   attribute_define? @relation(fields: [sub_attributeID], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "product_detail_attribute_define_id_fk")
+  product_child      product_child?    @relation(fields: [product_childID], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "product_detail_product_child_id_fk")
+  storage_location   storage_location? @relation(fields: [storage_locationID], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "product_detail_storage_location_id_fk")
+
+  @@index([sub_attributeID], map: "product_detail_attribute_define_id_fk")
+  @@index([product_childID], map: "product_detail_product_child_id_fk")
+  @@index([storage_locationID], map: "product_detail_storage_location_id_fk")
+}
+
+model product_parent {
+  id                 Int                 @id @default(autoincrement())
+  name               String?             @db.VarChar(1000)
+  CategoryID         Int?
+  thumbnail_img      String?             @db.VarChar(1000)
+  create_date        DateTime?           @db.Timestamp(0)
+  desc_content       String?             @db.VarChar(5000)
+  likes              Int?
+  active             Int?
+  gallery_api        String?             @db.TinyText
+  product_child      product_child[]
+  combine_categories combine_categories? @relation(fields: [CategoryID], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "sub")
+
+  @@index([CategoryID], map: "sub")
+}
+
+model storage_location {
+  id               Int              @id @default(autoincrement())
+  location_address String?          @db.TinyText
+  create_date      DateTime?        @db.Timestamp(0)
+  product_detail   product_detail[]
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view categories_client_helper {
+  id            Int     @unique
+  name          String? @db.TinyText
+  category_id   Int     @default(0) @db.SmallInt
+  category_name String? @db.Char(255)
+  gender_id     Int     @default(0) @db.SmallInt
+  gender        String? @db.TinyText
+}
