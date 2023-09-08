@@ -8,7 +8,7 @@ import { pagingProcess } from "../../helper/utils/paging.utils";
 const getAllCategories = async () => {
     const dataRetrive = await redisClient.get('categories');
     //find and retrive
-    if (dataRetrive !== null && redisProjectConfig.categories.redisStatus) {
+    if (dataRetrive !== null && !redisProjectConfig.categories.redisStatus) {
         return composeApiTemplateForResponse('v1.0.0', JSON.parse(dataRetrive), 'null', 'null');
     }
     else {

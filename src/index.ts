@@ -7,6 +7,7 @@ import './helper/db/mongodb.helper'
 //import route
 import categoriesRoute from './api/routes/categories.routes'
 import bannerRoute from './api/routes/banner.routes'
+import productRoute from './api/routes/product.routes'
 
 const app : Express = express();
 const port = process.env.PORT || 4000;
@@ -17,6 +18,7 @@ app.use(requestTracker)
 
 app.use('/categories',categoriesRoute)
 app.use('/banner',bannerRoute)
+app.use('/product',productRoute)
 
 
 

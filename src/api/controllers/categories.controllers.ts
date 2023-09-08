@@ -2,6 +2,8 @@ import express from "express";
 import categoriesServices from '../services/categories.services'
 
 const getAllCategories = async (req: express.Request , res: express.Response)  => {
+    const query  = req.query;
+    console.log(query)
     const result = await categoriesServices.getAllCategories();
     res.status(200).json(result);
 }
