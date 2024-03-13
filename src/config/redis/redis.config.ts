@@ -3,8 +3,9 @@ const redisProjectConfig ={
         redisStatus: true,
     },
     category: {
-        redisStatus: false,
-    }
+        redisStatus: true,
+    },
+    attributes: true
 }
 
 export default redisProjectConfig;

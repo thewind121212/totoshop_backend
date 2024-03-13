@@ -32,7 +32,7 @@ mongoose.connect(dbURL, connectOptions).catch((error) => {
 mongoose.connection.once('open', () => {
     console.log('Connected to MongoDB database');
     
-    const checkInterval = setInterval(connectAndCheckingConnect, 1000 * 60 * 5);
+    const checkInterval = setInterval(connectAndCheckingConnect, 1000 * 60 * 5 );
     
     process.on('SIGINT', () => {
       clearInterval(checkInterval);

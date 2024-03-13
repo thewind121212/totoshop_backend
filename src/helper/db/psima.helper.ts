@@ -4,8 +4,9 @@ import { PrismaClient } from "@prisma/client";
 
  const prisma = new PrismaClient();
 
-export default prisma;
 
+
+export default prisma;
 async function checkDatabaseConnection() {
     try {
       await prisma.combine_categories.findMany();
@@ -16,8 +17,9 @@ async function checkDatabaseConnection() {
     }
   }
 
+checkDatabaseConnection()
 
-  const checkInterval = setInterval(checkDatabaseConnection, 1000 * 60 * 5);
+export const checkInterval = setInterval(checkDatabaseConnection, 1000 * 60 * 10);
 
 // Stop checking when the application is shutting down
 

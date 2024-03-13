@@ -100,6 +100,7 @@ model product_detail {
   amount             Int?
   sub_attributeID    Int?
   storage_locationID Int?
+  sold               Int?
   attribute_define   attribute_define? @relation(fields: [sub_attributeID], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "product_detail_attribute_define_id_fk")
   product_child      product_child?    @relation(fields: [product_childID], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "product_detail_product_child_id_fk")
   storage_location   storage_location? @relation(fields: [storage_locationID], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "product_detail_storage_location_id_fk")
@@ -132,9 +133,8 @@ model storage_location {
   product_detail   product_detail[]
 }
 
-/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 view categories_client_helper {
-  id            Int     @unique
+  id            Int     @unique @default(0)
   name          String? @db.TinyText
   category_id   Int     @default(0) @db.SmallInt
   category_name String? @db.Char(255)
