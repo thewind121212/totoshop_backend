@@ -1,5 +1,5 @@
 
-import {removeDiacritics } from "../utils/string.utils";
+import {removeDiacritics } from "./string.utils";
 
 
 export const breadCrumbBuilder = (categoriesID : any, dataProductDetail : any) => {
