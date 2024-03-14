@@ -3,7 +3,6 @@ export const composeApiTemplateForResponse = (apiVer: string,data: any, errorMsg
 
     return {
         ...additionData,
-        success: true,
         data: data,
         apiVersion: apiVer,
         error: {
@@ -14,3 +13,6 @@ export const composeApiTemplateForResponse = (apiVer: string,data: any, errorMsg
     }
 
 }
+
+
+export const limitProductQuery = 40

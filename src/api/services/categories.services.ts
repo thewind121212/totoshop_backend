@@ -29,25 +29,26 @@ const queryCategory = async (query: number[], layerQuery : string) => {
 
     //! check paramerter to return  
 
-    if (38 > 40) {
-        return {
-            statusCode: 403,
-            data: composeApiTemplateForResponse('v1.0.0', null, 'limit must be less than 40', '403')
-        }
-    }
 
     //! if paremeter is ok then query
     try {
-        // let mainData: any = undefined
-        // //! retrive data from redis then set to main variable
-        // const dataRetrive = await redisClient.get(layerQuery);
-        // if (dataRetrive && !redisProjectConfig.category.redisStatus) {
-        //     const dataFromRedis = JSON.parse(dataRetrive);
-        //     mainData = { breadCrum: dataFromRedis.breadCrum, products: dataFromRedis.products };
-        // }
+        let mainData: any = undefined
 
-        //! if not found in redis then query to db and get data set to redis and return data to main variable
-        const data = await getProductsByCategory(16);
+        const allProducts : any = []
+        const products: any = await Promise.all(query.map(async(item: any) => getProductsByCategory(item)))
+
+        products.map((item: any) => {
+            allProducts.push(...item)
+        }).sort()        
+
+
+        //set to redis
+        await redisClient.set(layerQuery, JSON.stringify(allProducts), 'EX', 60 * 60 * 24)
+
+        return { statusCode: 200, data: allProducts };
+
+        // console.log(products.length)
+
 
         //! after retrive data from redis or db
 
@@ -85,7 +86,6 @@ const queryCategory = async (query: number[], layerQuery : string) => {
 
     } catch (error) {
         //error logic here
-        console.log(error)
         console.log('some thing went fuking wrong in categories.services.ts')
         return { statusCode: 404, data: composeApiTemplateForResponse('v1.0.0', [], 'some thing went wrong', '404') };
     }

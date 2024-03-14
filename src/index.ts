@@ -18,10 +18,18 @@ const port = process.env.PORT || 4000;
 
 app.use(requestTracker)
 
-app.use('/categories',categoriesRoute)
-app.use('/banner',bannerRoute)
-app.use('/product',productRoute)
-app.use('/attributes',attributesRoute)
+
+
+
+const baseUrlAPI =  '/' + process.env.BASE_API_URL || 'api'
+const APIVersion =  '/' + process.env.API_VERSION || 'v1' 
+const fullPath = baseUrlAPI + APIVersion
+
+
+app.use(`${fullPath}/categories`,categoriesRoute)
+app.use(`${fullPath}/banner`,bannerRoute)
+app.use(`${fullPath}/product`,productRoute)
+app.use(`${fullPath}/attributes`,attributesRoute)
 
 
 

@@ -1,15 +1,38 @@
 import express from "express";
 import categoriesServices from '../services/categories.services'
 import prisma from "../../helper/db/psima.helper";
+import { getLayerQuery } from "../../helper/function/category.helper";
+import { pagingProcess } from "../../helper/utils/paging.utils";
+import { composeApiTemplateForResponse } from "../../config/api/api.config";
 import { CategoryModel } from "../models/category.model";
+import e from "express";
 
-const getAllCategories = async (req: express.Request , res: express.Response) => {
+const getAllCategories = async (req: express.Request, res: express.Response) => {
     const result = await categoriesServices.getAllCategories();
     res.status(200).json(result);
 }
 
-const queryCategory = async (req: express.Request , res: express.Response)  => {
-    const query : any = req.query;
+
+const queryFullCategory = async (req: express.Request, res: express.Response) => {
+
+    const query: any = req.query;
+
+    const servicesCode: any = []
+    const fullCategories = (await prisma.categories_client_helper.findMany()).map((item: any) => { return item.id })
+    const result = await categoriesServices.queryCategory(fullCategories, "/");
+
+    const page =  Number(query.page) ? Number(query.page) : 1
+    const itemCount = Number(query.quantity) ? Number(query.quantity) : 40
+    const resultPaging = pagingProcess(result.data, page , itemCount); 
+    res.status(resultPaging.statusCode).json(resultPaging.data);
+}
+
+
+
+const queryCategory = async (req: express.Request, res: express.Response) => {
+
+
+    const query: any = req.query;
     // console.log(req.originalUrl)
     // let filter : any = {
     //     filterActive: true,
@@ -24,38 +47,48 @@ const queryCategory = async (req: express.Request , res: express.Response)  => {
     //     filter.subCategory = filter.subCategory.map((item : any) => Number(item))
     // }
 
+    
+
+
     const layerQuery = req.params[0].split('/');
+    layerQuery.map((layer: any, index: any) => {
+        if (layer === "") {
+            layerQuery.splice(index, 1)
+        }
+    })
 
-    console.log(layerQuery)
+    const { data }: any = await categoriesServices.getAllCategories()
+    const categoryID = getLayerQuery(data, layerQuery)
 
-    const categoryShouldQuery =  await categoriesServices.getAllCategories()
-
-
-    const queryObject = {
-        ...query,
-        page: Number(query.page)? Number(query.page) : 1,
-        limit: Number(query.limit)? Number(query.limit) : 40
+    
+    if (categoryID === null) {
+        return res.status(404).json(null);  
     }
+
+    if (categoryID !== null) {
+    const result = await categoriesServices.queryCategory(categoryID, req.originalUrl );
+
+    const page =  Number(query.page) ? Number(query.page) : 1
+    const itemCount = Number(query.quantity) ? Number(query.quantity) : 40
+    const resultPaging = pagingProcess(result.data, page , itemCount); 
+
+        return res.status(resultPaging.statusCode).json(resultPaging.data);
+    }
+
+
+
     // const result = await categoriesServices.queryCategory(queryObject);
-    res.status(200).json(null);
 }
 
 // const getMixJacket = async (req: express.Request , res: express.Response) => {
-//     const result = await categoriesServices.getMixJacket();
+//     ccategory.nameonst result = await categoriesServices.getMixJacket();
 //     res.status(result.statusCode).json(result.data);
 // }
 
 
-const queryFullCategory = async (req: express.Request , res: express.Response) => {
-    console.log(req.originalUrl)
-    console.log("getFullCategory")
-    const fullCategories = (await prisma.categories_client_helper.findMany()).map((item : any) => {return item.id})
-    const result = await categoriesServices.queryCategory(fullCategories, "/");
-    
-    //query product for all category
 
-    res.status(200).json(null);
-}
+
+
 
 
 export default {

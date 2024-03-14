@@ -9,37 +9,38 @@ import prisma from '../db/psima.helper';
 
 //get product detail from mysql
 
-const getProductDetailFromMysql = async (productId: any) => {
-        return await prisma.product_parent.findUnique({ where: { id: Number(productId) }, include: { product_child: { include: { attribute_define: true, product_detail: { include: { attribute_define: true } } } } } })
+const getProductDetailFromMysql =  (productId: any) => {
+        return  prisma.product_parent.findUnique({ where: { id: Number(productId) }, include: { product_child: { include: { attribute_define: true, product_detail: { include: { attribute_define: true } } } } } })
 }
 //get categoryId
 
-const getCategoryId = async () => {
-        return await await prisma.categories_client_helper.findMany()
+const getCategoryId =  () => {
+
+        return  prisma.categories_client_helper.findMany()
 }
 
 //get galerry from id
-const getGalleryFromId = async (productId: any) => {
-        return await  GalleryModel.findOne({ idProduct: Number(productId) })
+const getGalleryFromId = (productId: any) => {
+        return  GalleryModel.findOne({ idProduct: Number(productId) })
 }
 
 
 //get product detail from id
 const getProductDetailFromDB = async (productId: any) => {
-        try {
-            const [dataProductDetail, categoriesID, getGallery] = await Promise.all([getProductDetailFromMysql(productId), getCategoryId(), getGalleryFromId(productId)])
-            return {
-                dataProductDetail,
-                categoriesID,
-                getGallery
-            }
-        } catch (error) {
-            return {
-                dataProductDetail: null,
-                categoriesID: null,
-                getGallery: null
-            }
+    try {
+        const [dataProductDetail, categoriesID, getGallery] = await Promise.all([getProductDetailFromMysql(productId), getCategoryId(), getGalleryFromId(productId)])
+        return {
+            dataProductDetail,
+            categoriesID,
+            getGallery
         }
+    } catch (error) {
+        return {
+            dataProductDetail: Error,
+            categoriesID: Error,
+            getGallery: Error
+        }
+    }
 }
 
 
@@ -52,25 +53,31 @@ export const getProductDetailHelper = async (productId: any) => {
     const dataRetriveFromRedist = await redisClient.get(productDetailTree);
     if (dataRetriveFromRedist !== null) {
         dataRetrive = await JSON.parse(dataRetriveFromRedist)
-        console.log('data retrive from redis', dataRetrive)
+        console.log('data retrive from redis', productId)
         return dataRetrive
     }
 
     //! data from cache not found
     if (dataRetriveFromRedist === null) {
-        const { dataProductDetail, categoriesID, getGallery } : any = await getProductDetailFromDB(productId)
+        let data :any = null
 
+
+        const { dataProductDetail, categoriesID, getGallery }: any = await getProductDetailFromDB(productId)
+
+        if (dataProductDetail === Error || categoriesID === Error || getGallery === Error) {
+            dataRetrive = null
+            return dataRetrive
+        }
 
         if (dataProductDetail === null) {
             dataRetrive = undefined
             return dataRetrive
         }
 
-        let galleryFetched : any = getGallery
+        let galleryFetched: any = getGallery
 
-        if (galleryFetched === undefined) {
-
-            galleryFetched  = {
+        if (galleryFetched === Error) {
+            galleryFetched = {
                 idProduct: Number(productId),
                 gallery: []
             }
@@ -88,7 +95,6 @@ export const getProductDetailHelper = async (productId: any) => {
             tags: [],
             sold: 0
         }
-
 
 
         let sold = 0
@@ -123,6 +129,7 @@ export const getProductDetailHelper = async (productId: any) => {
 
         dataRetrive = productItem
 
+
         redisClient.set(productDetailTree, JSON.stringify(dataRetrive), 'EX', 60 * 60)
 
 
@@ -140,7 +147,7 @@ const fetchHelper = (productId: any) => {
 }
 
 export const fetchHelperMuti = async (productIdArray: any) => {
-    const products: any = Promise.all(productIdArray.map((item: any) => fetchHelper(item)))
+    const products: any = await Promise.all(productIdArray.map((item: any) => fetchHelper(item)))
     return products
 }
 
