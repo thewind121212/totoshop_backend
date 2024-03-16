@@ -1,0 +1,21 @@
+# Environment variables declared in this file are automatically made available to Prisma.
+# See the documentation for more detail: https://pris.ly/d/prisma-schema#accessing-environment-variables-from-the-schema
+
+# Prisma supports the native connection string format for PostgreSQL, MySQL, SQLite, SQL Server, MongoDB and CockroachDB.
+# See the documentation for all the connection string options: https://pris.ly/d/connection-strings
+
+DATABASE_URL="mysql://root:linhporo1@10.10.0.217:3034/shop_data"
+MONGO_URI="10.10.0.217"
+MONGO_PORT="26017"
+MONGO_USER="adminLinh"
+MONGO_PASSWORD="linhporo1"
+MONGO_DBNAME="totodayshopClone"
+PORT=4000
+# redis
+REDIS_HOST="10.10.0.217"
+REDIS_PORT="6793"
+REDIS_USER="default"
+REDIS_PASSWORD=""
+REDIS_DB=0
+API_VERSION="v1"
+BASE_API_URL="api"

@@ -2,7 +2,7 @@ import { Redis} from 'ioredis';
 import { RedisOptions } from 'ioredis/built/cluster/util';
 
 const redisConfig : RedisOptions = {
-   port: 6379,
+   port: Number(process.env.REDIS_PORT),
    host: process.env.REDIS_HOST || 'localhost',
    username: process.env.REDIS_USER || 'root', 
    password: process.env.REDIS_PASSWORD || 'root',

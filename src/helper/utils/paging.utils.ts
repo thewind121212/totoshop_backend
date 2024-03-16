@@ -30,6 +30,6 @@ export const pagingProcess = (data: any[], page: number, itemsCout: number) => {
         data: composeApiTemplateForResponse('v1.0.0', {
             result,
             totalPage
-        }, `fetch ${itemsCout} products in page ${page}/${totalPage}`, '200')
+        }, `fetched ${result.length} products in page ${page}/${totalPage}`, '200')
     }
 }
