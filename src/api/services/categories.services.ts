@@ -3,9 +3,6 @@ import { composeApiTemplateForResponse } from "../../config/api/api.config";
 import redisClient from "../../helper/db/redis.helper";
 import redisProjectConfig from "../../config/redis/redis.config";
 import { getProductsByCategory } from "../../helper/function/category.helper";
-import { pagingProcess } from "../../helper/utils/paging.utils";
-import { colorFilter, sizeFilter, priceFilter } from "../../helper/function/product-filter.helper";
-import { orderProducts } from "../../helper/function/product-order.helper";
 import { JacketMixModel } from "../models/jacketMix.model";
 
 const getAllCategories = async () => {

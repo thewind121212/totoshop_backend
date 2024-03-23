@@ -1,7 +1,9 @@
 export type ProductItemType = {
     id: number,
     name: string,
-    price: string,
+    price: number,
+    likes: number,
+    created_at: string,
     thumbnail: string,
     gallery: string[],
     description: string,

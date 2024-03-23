@@ -53,7 +53,6 @@ export const getProductDetailHelper = async (productId: any) => {
     const dataRetriveFromRedist = await redisClient.get(productDetailTree);
     if (dataRetriveFromRedist !== null) {
         dataRetrive = await JSON.parse(dataRetriveFromRedist)
-        console.log('data retrive from redis', productId)
         return dataRetrive
     }
 
@@ -83,10 +82,13 @@ export const getProductDetailHelper = async (productId: any) => {
             }
         }
 
+
         const productItem: ProductItemType = {
             id: dataProductDetail.id,
             name: dataProductDetail.name,
-            price: dataProductDetail.product_child[0].product_detail[0].price,
+            price: Number(dataProductDetail.product_child[0].product_detail[0].price),
+            likes: dataProductDetail.likes,
+            created_at: dataProductDetail.create_date,
             thumbnail: '',
             gallery: [...galleryFetched.gallery],
             description: dataProductDetail.desc_content,
@@ -95,6 +97,7 @@ export const getProductDetailHelper = async (productId: any) => {
             tags: [],
             sold: 0
         }
+
 
 
         let sold = 0

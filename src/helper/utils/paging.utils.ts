@@ -11,11 +11,18 @@ export const pagingProcess = (data: any[], page: number, itemsCout: number) => {
         }
     }
 
+
+    if (data.length === 0) {
+        return {
+            statusCode: 200,
+            data: composeApiTemplateForResponse('v1.0.0', [], '0 product found', '200')
+        }
+    }
+
     const totalPage = Math.ceil(data.length / itemsCout);
     const start = (page - 1) * itemsCout;
     const end = start + itemsCout;
     const result = data.slice(start, end);
-
 
     if (page > totalPage) {
         return {
@@ -25,11 +32,13 @@ export const pagingProcess = (data: any[], page: number, itemsCout: number) => {
     }
 
 
+
     return {
         statusCode: 200,
         data: composeApiTemplateForResponse('v1.0.0', {
             result,
-            totalPage
+            totalPage,
+            productQuantity: data.length
         }, `fetched ${result.length} products in page ${page}/${totalPage}`, '200')
     }
 }

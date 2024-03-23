@@ -3,9 +3,7 @@ import categoriesServices from '../services/categories.services'
 import prisma from "../../helper/db/psima.helper";
 import { getLayerQuery } from "../../helper/function/category.helper";
 import { pagingProcess } from "../../helper/utils/paging.utils";
-import { composeApiTemplateForResponse } from "../../config/api/api.config";
-import { CategoryModel } from "../models/category.model";
-import e from "express";
+import { sortProducts } from "../../helper/function/product-sort.helper";
 
 const getAllCategories = async (req: express.Request, res: express.Response) => {
     const result = await categoriesServices.getAllCategories();
@@ -16,12 +14,16 @@ const getAllCategories = async (req: express.Request, res: express.Response) => 
 const queryFullCategory = async (req: express.Request, res: express.Response) => {
 
     const query: any = req.query;
+    
 
-    const servicesCode: any = []
     const fullCategories = (await prisma.categories_client_helper.findMany()).map((item: any) => { return item.id })
     const result = await categoriesServices.queryCategory(fullCategories, "/");
 
     const page =  Number(query.page) ? Number(query.page) : 1
+    const sortBy = query.sortBy ? query.sortBy : 'default'
+    if (sortBy !== 'default') {
+        result.data = sortProducts(result.data, sortBy)
+    }
     const itemCount = Number(query.quantity) ? Number(query.quantity) : 40
     const resultPaging = pagingProcess(result.data, page , itemCount); 
     res.status(resultPaging.statusCode).json(resultPaging.data);
